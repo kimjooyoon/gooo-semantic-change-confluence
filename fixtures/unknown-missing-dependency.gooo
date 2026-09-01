@@ -1,0 +1,13 @@
+{
+  "schema": "gooo/source-input/v1",
+  "case_id": "unknown-missing-dependency",
+  "source_id": "receipt-unknown-dependency",
+  "contract": "receipt/v1",
+  "toolchain": "go1.27.0",
+  "runner": "gooo-confluence-ci",
+  "baseline": {"receipt.id": "r-104", "receipt.total": "4000"},
+  "operations": [
+    {"id": "change-a", "authority": "source-owner-a", "scope": ["receipt.currency"], "patches": [{"path": "receipt.currency", "value": "KRW"}]},
+    {"id": "change-b", "depends_on": ["operation-not-present"], "authority": "source-owner-b", "scope": ["receipt.tax_code"], "patches": [{"path": "receipt.tax_code", "value": "VAT"}]}
+  ]
+}

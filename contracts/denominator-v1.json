@@ -1,0 +1,11 @@
+{
+  "schema": "gooo/semantic-change-confluence-denominator/v1",
+  "fixed_before_implementation": true,
+  "cases_total": 9,
+  "classes": {"normal": 3, "unknown": 3, "refuted": 3},
+  "terminals": {"normal": "CLOSED", "unknown": "UNKNOWN", "refuted": "REFUTED"},
+  "reduction_order": ["REFUTED", "UNKNOWN", "CLOSED"],
+  "scoring": "forbidden",
+  "percentages": "forbidden",
+  "weighted_sums": "forbidden"
+}

@@ -1,0 +1,72 @@
+{
+  "schema": "gooo/semantic-change-confluence/v1",
+  "language": "Gooo",
+  "cross_project_required_gates": 0,
+  "semantic_graph": {
+    "nodes": [
+      {"id": "source", "kind": "gooo-source"},
+      {"id": "semantic-ir", "kind": "canonical-semantic-ir"},
+      {"id": "change-a", "kind": "change-operation"},
+      {"id": "change-b", "kind": "change-operation"},
+      {"id": "generated-artifact", "kind": "derived-go-artifact"},
+      {"id": "provenance", "kind": "canonical-provenance"},
+      {"id": "decision", "kind": "closed-unknown-refuted"}
+    ],
+    "edges": [
+      {"from": "source", "to": "change-a", "kind": "declares"},
+      {"from": "source", "to": "change-b", "kind": "declares"},
+      {"from": "change-a", "to": "semantic-ir", "kind": "transforms"},
+      {"from": "change-b", "to": "semantic-ir", "kind": "transforms"},
+      {"from": "semantic-ir", "to": "generated-artifact", "kind": "generates"},
+      {"from": "semantic-ir", "to": "provenance", "kind": "records"},
+      {"from": "semantic-ir", "to": "decision", "kind": "evaluates"}
+    ]
+  },
+  "change_operations": [
+    {
+      "id": "change-a",
+      "name": "AddCurrencyCode",
+      "kind": "parallel-semantic-change",
+      "depends_on": [],
+      "authority": "source-owner-a",
+      "guardrails": ["preserve-receipt-id", "write-declared-scope-only"],
+      "scope": ["receipt.currency"]
+    },
+    {
+      "id": "change-b",
+      "name": "AddTaxCode",
+      "kind": "parallel-semantic-change",
+      "depends_on": [],
+      "authority": "source-owner-b",
+      "guardrails": ["preserve-receipt-id", "write-declared-scope-only"],
+      "scope": ["receipt.tax_code"]
+    }
+  ],
+  "application_orders": {
+    "A_then_B": ["change-a", "change-b"],
+    "B_then_A": ["change-b", "change-a"]
+  },
+  "authorities": {
+    "merge_authority": 0,
+    "runtime_write": 0,
+    "input_owner": "caller-owned-source",
+    "conflict_pairs": [["external-owner-a", "external-owner-b"]]
+  },
+  "guardrails": {
+    "forbidden_path_prefixes": ["receipt.private", "runtime"],
+    "required_input_paths": ["receipt.id", "receipt.total"],
+    "required_operation_fields": ["scope", "authority", "patches"]
+  },
+  "reduction_order": ["REFUTED", "UNKNOWN", "CLOSED"],
+  "canonical_cases": [
+    {"id": "normal-independent", "kind": "normal", "expected": "CLOSED", "description": "disjoint fields converge"},
+    {"id": "normal-idempotent", "kind": "normal", "expected": "CLOSED", "description": "same field and same value converge"},
+    {"id": "normal-nested", "kind": "normal", "expected": "CLOSED", "description": "disjoint nested fields converge"},
+    {"id": "unknown-missing-dependency", "kind": "unknown", "expected": "UNKNOWN", "description": "dependency frontier is absent"},
+    {"id": "unknown-missing-scope", "kind": "unknown", "expected": "UNKNOWN", "description": "operation scope is absent"},
+    {"id": "unknown-missing-input", "kind": "unknown", "expected": "UNKNOWN", "description": "required semantic input is absent"},
+    {"id": "refuted-order-dependent", "kind": "refuted", "expected": "REFUTED", "description": "last writer changes with order"},
+    {"id": "refuted-authority-conflict", "kind": "refuted", "expected": "REFUTED", "description": "incompatible authorities contend"},
+    {"id": "refuted-guardrail-conflict", "kind": "refuted", "expected": "REFUTED", "description": "a patch violates a guardrail"}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema": "gooo/source-input/v1",
+  "case_id": "refuted-authority-conflict",
+  "source_id": "receipt-refuted-authority",
+  "contract": "receipt/v1",
+  "toolchain": "go1.27.0",
+  "runner": "gooo-confluence-ci",
+  "baseline": {"receipt.id": "r-108", "receipt.total": "8000"},
+  "operations": [
+    {"id": "change-a", "authority": "external-owner-a", "scope": ["receipt.currency"], "patches": [{"path": "receipt.currency", "value": "KRW"}]},
+    {"id": "change-b", "authority": "external-owner-b", "scope": ["receipt.currency"], "patches": [{"path": "receipt.currency", "value": "JPY"}]}
+  ]
+}

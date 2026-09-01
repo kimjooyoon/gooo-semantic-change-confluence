@@ -1,0 +1,13 @@
+{
+  "schema": "gooo/source-input/v1",
+  "case_id": "unknown-missing-input",
+  "source_id": "receipt-unknown-input",
+  "contract": "receipt/v1",
+  "toolchain": "go1.27.0",
+  "runner": "gooo-confluence-ci",
+  "baseline": {"receipt.id": "r-106"},
+  "operations": [
+    {"id": "change-a", "authority": "source-owner-a", "scope": ["receipt.currency"], "patches": [{"path": "receipt.currency", "value": "KRW"}]},
+    {"id": "change-b", "authority": "source-owner-b", "scope": ["receipt.tax_code"], "patches": [{"path": "receipt.tax_code", "value": "VAT"}]}
+  ]
+}

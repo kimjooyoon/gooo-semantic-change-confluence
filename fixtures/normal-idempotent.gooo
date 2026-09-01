@@ -1,0 +1,13 @@
+{
+  "schema": "gooo/source-input/v1",
+  "case_id": "normal-idempotent",
+  "source_id": "receipt-normal-idempotent",
+  "contract": "receipt/v1",
+  "toolchain": "go1.27.0",
+  "runner": "gooo-confluence-ci",
+  "baseline": {"receipt.id": "r-102", "receipt.total": "2000"},
+  "operations": [
+    {"id": "change-a", "authority": "source-owner-a", "scope": ["receipt.currency"], "patches": [{"path": "receipt.currency", "value": "KRW"}]},
+    {"id": "change-b", "authority": "source-owner-b", "scope": ["receipt.currency"], "patches": [{"path": "receipt.currency", "value": "KRW"}]}
+  ]
+}

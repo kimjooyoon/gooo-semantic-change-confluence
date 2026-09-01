@@ -1,0 +1,13 @@
+{
+  "schema": "gooo/source-input/v1",
+  "case_id": "normal-nested",
+  "source_id": "receipt-normal-nested",
+  "contract": "receipt/v1",
+  "toolchain": "go1.27.0",
+  "runner": "gooo-confluence-ci",
+  "baseline": {"receipt.id": "r-103", "receipt.total": "3000"},
+  "operations": [
+    {"id": "change-a", "authority": "source-owner-a", "scope": ["receipt.customer.country"], "patches": [{"path": "receipt.customer.country", "value": "KR"}]},
+    {"id": "change-b", "authority": "source-owner-b", "scope": ["receipt.customer.locale"], "patches": [{"path": "receipt.customer.locale", "value": "ko-KR"}]}
+  ]
+}
