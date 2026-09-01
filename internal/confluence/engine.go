@@ -170,6 +170,9 @@ func EvaluateToDirectory(spec Spec, input SourceInput, outputRoot string) (Resul
 	activeOutputRoot = outputRoot
 	defer func() { activeOutputRoot = "" }()
 	result, _, _ := Evaluate(spec, input)
+	if result.Schema == "" || result.Decision == "" {
+		return Result{}, errors.New("semantic evaluation did not produce a terminal result")
+	}
 	data, err := marshalCanonical(result)
 	if err != nil {
 		return Result{}, err
@@ -243,6 +246,16 @@ func preflight(spec Spec, input SourceInput) (string, []string, string) {
 	}
 	for _, operation := range input.Operations {
 		for _, patch := range operation.Patches {
+			inScope := false
+			for _, scope := range operation.Scope {
+				if pathWithin(patch.Path, scope) {
+					inScope = true
+					break
+				}
+			}
+			if !inScope {
+				return "operation writes outside its declared semantic scope", []string{"guardrail:write-declared-scope-only", "operation:" + operation.ID + ":" + patch.Path}, Refuted
+			}
 			for _, prefix := range spec.Guardrails.ForbiddenPathPrefixes {
 				if pathWithin(patch.Path, prefix) {
 					return "guardrail forbids the requested semantic path", []string{"guardrail:" + prefix, "operation:" + operation.ID + ":" + patch.Path}, Refuted
