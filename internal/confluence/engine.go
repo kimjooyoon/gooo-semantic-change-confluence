@@ -33,6 +33,10 @@ func LoadInput(path string) (SourceInput, error) {
 }
 
 func Evaluate(spec Spec, input SourceInput) (Result, map[string]OrderEvidence, map[string]struct{ /* semantic ir, generated, provenance */ }) {
+	return evaluate(spec, input, "")
+}
+
+func evaluate(spec Spec, input SourceInput, outputRoot string) (Result, map[string]OrderEvidence, map[string]struct{ /* semantic ir, generated, provenance */ }) {
 	result := Result{
 		Schema:         "gooo/semantic-confluence-result/v1",
 		CaseID:         input.CaseID,
@@ -122,8 +126,10 @@ func Evaluate(spec Spec, input SourceInput) (Result, map[string]OrderEvidence, m
 		artifacts[orderName+"/semantic-ir.json"] = struct{}{}
 		artifacts[orderName+"/generated.go"] = struct{}{}
 		artifacts[orderName+"/provenance.json"] = struct{}{}
-		if err := writeOrderFiles(orderName, irBytes, generated, provenanceBytes); err != nil {
-			return Result{}, nil, artifacts
+		if outputRoot != "" {
+			if err := writeOrderFiles(outputRoot, orderName, irBytes, generated, provenanceBytes); err != nil {
+				return Result{}, nil, artifacts
+			}
 		}
 	}
 
@@ -144,13 +150,11 @@ func Evaluate(spec Spec, input SourceInput) (Result, map[string]OrderEvidence, m
 	return result, orders, artifacts
 }
 
-var activeOutputRoot string
-
-func writeOrderFiles(orderName string, ir, generated, provenance []byte) error {
-	if activeOutputRoot == "" {
+func writeOrderFiles(outputRoot, orderName string, ir, generated, provenance []byte) error {
+	if outputRoot == "" {
 		return errors.New("output root is not bound")
 	}
-	directory := filepath.Join(activeOutputRoot, orderName)
+	directory := filepath.Join(outputRoot, orderName)
 	if err := os.MkdirAll(directory, 0o755); err != nil {
 		return err
 	}
@@ -167,9 +171,7 @@ func EvaluateToDirectory(spec Spec, input SourceInput, outputRoot string) (Resul
 	if err := os.MkdirAll(outputRoot, 0o755); err != nil {
 		return Result{}, err
 	}
-	activeOutputRoot = outputRoot
-	defer func() { activeOutputRoot = "" }()
-	result, _, _ := Evaluate(spec, input)
+	result, _, _ := evaluate(spec, input, outputRoot)
 	if result.Schema == "" || result.Decision == "" {
 		return Result{}, errors.New("semantic evaluation did not produce a terminal result")
 	}
