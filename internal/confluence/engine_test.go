@@ -4,6 +4,13 @@ import (
 	"testing"
 )
 
+func TestDecodeRejectsTrailingJSONValue(t *testing.T) {
+	var input SourceInput
+	if err := decode([]byte(`{"schema":"gooo/source-input/v1"} {}`), &input); err == nil {
+		t.Fatal("decode accepted a trailing JSON value")
+	}
+}
+
 func testSpec() Spec {
 	return Spec{
 		SemanticGraph: SemanticGraph{Nodes: []GraphNode{{ID: "source", Kind: "source"}, {ID: "semantic-ir", Kind: "ir"}}},

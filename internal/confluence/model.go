@@ -1,6 +1,11 @@
 package confluence
 
-import "encoding/json"
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+)
 
 const (
 	Closed  = "CLOSED"
@@ -143,5 +148,17 @@ type Result struct {
 }
 
 func decode(data []byte, out any) error {
-	return json.Unmarshal(data, out)
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(out); err != nil {
+		return err
+	}
+	var trailing any
+	if err := decoder.Decode(&trailing); err != io.EOF {
+		if err == nil {
+			return fmt.Errorf("trailing JSON value")
+		}
+		return fmt.Errorf("trailing JSON data: %w", err)
+	}
+	return nil
 }
