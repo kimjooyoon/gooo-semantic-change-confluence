@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"sync"
 )
 
 func LoadSpec(path string) (Spec, error) {
@@ -145,6 +146,7 @@ func Evaluate(spec Spec, input SourceInput) (Result, map[string]OrderEvidence, m
 }
 
 var activeOutputRoot string
+var activeOutputRootMu sync.Mutex
 
 func writeOrderFiles(orderName string, ir, generated, provenance []byte) error {
 	if activeOutputRoot == "" {
@@ -164,6 +166,8 @@ func writeOrderFiles(orderName string, ir, generated, provenance []byte) error {
 }
 
 func EvaluateToDirectory(spec Spec, input SourceInput, outputRoot string) (Result, error) {
+	activeOutputRootMu.Lock()
+	defer activeOutputRootMu.Unlock()
 	if err := os.MkdirAll(outputRoot, 0o755); err != nil {
 		return Result{}, err
 	}
