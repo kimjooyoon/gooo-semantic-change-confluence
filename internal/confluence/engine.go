@@ -206,6 +206,9 @@ func sortedOperationIDs(operations map[string]Operation) []string {
 }
 
 func preflight(spec Spec, input SourceInput) (string, []string, string) {
+	if spec.Schema != "gooo/semantic-change-confluence/v1" || spec.Language != "Gooo" {
+		return "semantic contract schema or language is missing or unsupported", []string{"meta:schema"}, Unknown
+	}
 	if input.Schema != "gooo/source-input/v1" {
 		return "source input schema is missing or unsupported", []string{"input:schema"}, Unknown
 	}

@@ -6,6 +6,7 @@ import (
 
 func testSpec() Spec {
 	return Spec{
+		Schema: "gooo/semantic-change-confluence/v1", Language: "Gooo",
 		SemanticGraph: SemanticGraph{Nodes: []GraphNode{{ID: "source", Kind: "source"}, {ID: "semantic-ir", Kind: "ir"}}},
 		ChangeOperations: []Operation{{ID: "change-a"}, {ID: "change-b"}},
 		ApplicationOrders: map[string][]string{"A_then_B": {"change-a", "change-b"}, "B_then_A": {"change-b", "change-a"}},
