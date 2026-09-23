@@ -16,12 +16,21 @@ func testSpec() Spec {
 
 func testInput(caseID string, pathA, valueA, pathB, valueB string) SourceInput {
 	return SourceInput{
-		CaseID: caseID, SourceID: "test-source", Contract: "test/v1", Toolchain: "go1.27.0", Runner: "test-runner",
+		Schema: "gooo/source-input/v1", CaseID: caseID, SourceID: "test-source", Contract: "test/v1", Toolchain: "go1.27.0", Runner: "test-runner",
 		Baseline: map[string]string{"receipt.id": "test"},
 		Operations: []Operation{
 			{ID: "change-a", Authority: "source-owner-a", Scope: []string{pathA}, Patches: []Patch{{Path: pathA, Value: valueA}}},
 			{ID: "change-b", Authority: "source-owner-b", Scope: []string{pathB}, Patches: []Patch{{Path: pathB, Value: valueB}}},
 		},
+	}
+}
+
+func TestEvaluateUnknownForSchemaMismatch(t *testing.T) {
+	input := testInput("schema-mismatch", "receipt.currency", "KRW", "receipt.tax_code", "VAT")
+	input.Schema = "gooo/other-input/v1"
+	result, _, _ := Evaluate(testSpec(), input)
+	if result.Decision != Unknown || result.Unknown == nil || len(result.Unknown.BlockedBy) != 1 || result.Unknown.BlockedBy[0] != "input:schema" {
+		t.Fatalf("got decision=%q unknown=%+v", result.Decision, result.Unknown)
 	}
 }
 

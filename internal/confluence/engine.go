@@ -204,6 +204,9 @@ func sortedOperationIDs(operations map[string]Operation) []string {
 }
 
 func preflight(spec Spec, input SourceInput) (string, []string, string) {
+	if input.Schema != "gooo/source-input/v1" {
+		return "source input schema is not recognized", []string{"input:schema"}, Unknown
+	}
 	if input.SourceID == "" || input.Contract == "" || input.Toolchain == "" || input.Runner == "" {
 		return "source, contract, toolchain, and runner must all be declared", []string{"input:identity"}, Unknown
 	}
