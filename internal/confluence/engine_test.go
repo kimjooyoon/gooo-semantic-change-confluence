@@ -38,6 +38,16 @@ func TestEvaluateClosedForDisjointChanges(t *testing.T) {
 	}
 }
 
+func TestEvaluateDoesNotRequireOutputDirectory(t *testing.T) {
+	result, orders, artifacts := Evaluate(testSpec(), testInput("memory-only", "receipt.currency", "KRW", "receipt.tax_code", "VAT"))
+	if result.Decision != Closed || result.SemanticVerdict != "CONFLUENT" {
+		t.Fatalf("got decision=%q verdict=%q", result.Decision, result.SemanticVerdict)
+	}
+	if len(orders) != 2 || len(artifacts) != 6 {
+		t.Fatalf("orders=%d artifacts=%d want orders=2 artifacts=6", len(orders), len(artifacts))
+	}
+}
+
 func TestEvaluateUnknownCarriesFrontier(t *testing.T) {
 	input := testInput("unknown", "receipt.currency", "KRW", "receipt.tax_code", "VAT")
 	input.Operations[1].DependsOn = []string{"missing-operation"}
