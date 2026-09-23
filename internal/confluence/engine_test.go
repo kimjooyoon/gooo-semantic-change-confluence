@@ -47,6 +47,16 @@ func TestEvaluateClosedForDisjointChanges(t *testing.T) {
 	}
 }
 
+func TestEvaluateReturnsClosedResultWithoutOutputRoot(t *testing.T) {
+	result, _, artifacts := Evaluate(testSpec(), testInput("closed-direct", "receipt.currency", "KRW", "receipt.tax_code", "VAT"))
+	if result.Decision != Closed || result.SemanticVerdict != "CONFLUENT" {
+		t.Fatalf("got decision=%q verdict=%q", result.Decision, result.SemanticVerdict)
+	}
+	if len(artifacts) != 6 {
+		t.Fatalf("artifact manifest entries=%d want 6", len(artifacts))
+	}
+}
+
 func TestEvaluateUnknownCarriesFrontier(t *testing.T) {
 	input := testInput("unknown", "receipt.currency", "KRW", "receipt.tax_code", "VAT")
 	input.Operations[1].DependsOn = []string{"missing-operation"}
