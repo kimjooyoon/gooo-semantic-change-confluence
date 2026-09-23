@@ -56,6 +56,32 @@ func TestEvaluateRefutedForOrderDependentChanges(t *testing.T) {
 		t.Fatal(err)
 	}
 	if result.Decision != Refuted || result.Counterexample == nil || result.Counterexample.Path != "receipt.currency" {
-		t.Fatalf("got decision=%q counterexample=%+v", result.Decision, result.Counterexample)
+		 t.Fatalf("got decision=%q counterexample=%+v", result.Decision, result.Counterexample)
+	}
+}
+
+func TestDuplicateInputOperationIdentityIsUnknown(t *testing.T) {
+	input := testInput("duplicate-input", "receipt.currency", "KRW", "receipt.tax_code", "VAT")
+	input.Operations[1].ID = input.Operations[0].ID
+
+	result, err := EvaluateToDirectory(testSpec(), input, t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Decision != Unknown || result.Unknown == nil {
+		t.Fatalf("got decision=%q unknown=%+v", result.Decision, result.Unknown)
+	}
+}
+
+func TestDuplicateSpecOperationIdentityIsRefuted(t *testing.T) {
+	spec := testSpec()
+	spec.ChangeOperations[1].ID = spec.ChangeOperations[0].ID
+
+	result, err := EvaluateToDirectory(spec, testInput("duplicate-spec", "receipt.currency", "KRW", "receipt.tax_code", "VAT"), t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Decision != Refuted {
+		t.Fatalf("got decision=%q, want REFUTED", result.Decision)
 	}
 }

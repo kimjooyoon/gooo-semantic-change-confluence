@@ -207,6 +207,12 @@ func preflight(spec Spec, input SourceInput) (string, []string, string) {
 	if input.SourceID == "" || input.Contract == "" || input.Toolchain == "" || input.Runner == "" {
 		return "source, contract, toolchain, and runner must all be declared", []string{"input:identity"}, Unknown
 	}
+	if id, invalid := duplicateOperationID(spec.ChangeOperations); invalid {
+		return "meta change operation ids must be unique and non-empty", []string{"meta:operation:" + id}, Refuted
+	}
+	if id, invalid := duplicateOperationID(input.Operations); invalid {
+		return "input operation ids must be unique and non-empty", []string{"input:operation:" + id}, Unknown
+	}
 	if len(input.Operations) != 2 {
 		return "exactly two parallel change operations are required", []string{"input:operations"}, Unknown
 	}
@@ -264,6 +270,20 @@ func preflight(spec Spec, input SourceInput) (string, []string, string) {
 		}
 	}
 	return "", nil, ""
+}
+
+func duplicateOperationID(operations []Operation) (string, bool) {
+	seen := make(map[string]struct{}, len(operations))
+	for _, operation := range operations {
+		if operation.ID == "" {
+			return "<empty>", true
+		}
+		if _, exists := seen[operation.ID]; exists {
+			return operation.ID, true
+		}
+		seen[operation.ID] = struct{}{}
+	}
+	return "", false
 }
 
 func orderCounterexample(spec Spec, input SourceInput, left, right OrderEvidence) *Counterexample {
