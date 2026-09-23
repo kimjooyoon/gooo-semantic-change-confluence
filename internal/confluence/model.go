@@ -23,6 +23,7 @@ type Spec struct {
 	Guardrails        Guardrails        `json:"guardrails"`
 	CanonicalCases    []CanonicalCase   `json:"canonical_cases"`
 	ReductionOrder    []string          `json:"reduction_order"`
+	CrossProjectRequiredGates int       `json:"cross_project_required_gates"`
 }
 
 type SemanticGraph struct {
