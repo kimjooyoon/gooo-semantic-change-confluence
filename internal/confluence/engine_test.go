@@ -50,6 +50,18 @@ func TestEvaluateUnknownCarriesFrontier(t *testing.T) {
 	}
 }
 
+func TestEvaluateUnknownForMalformedApplicationOrder(t *testing.T) {
+	spec := testSpec()
+	spec.ApplicationOrders["A_then_B"] = []string{"change-a", "missing-operation"}
+	result, err := EvaluateToDirectory(spec, testInput("malformed-order", "receipt.currency", "KRW", "receipt.tax_code", "VAT"), t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Decision != Unknown || result.Unknown == nil {
+		t.Fatalf("got decision=%q unknown=%+v", result.Decision, result.Unknown)
+	}
+}
+
 func TestEvaluateRefutedForOrderDependentChanges(t *testing.T) {
 	result, err := EvaluateToDirectory(testSpec(), testInput("refuted", "receipt.currency", "KRW", "receipt.currency", "USD"), t.TempDir())
 	if err != nil {
