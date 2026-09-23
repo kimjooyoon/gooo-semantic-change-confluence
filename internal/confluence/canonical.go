@@ -140,6 +140,9 @@ func operationConflict(spec Spec, left, right Operation) (string, bool) {
 	for _, leftPatch := range left.Patches {
 		for _, rightPatch := range right.Patches {
 			if leftPatch.Path == rightPatch.Path {
+				if leftPatch.Value != rightPatch.Value {
+					return "operations write different values to the same semantic path", true
+				}
 				sharedPath = true
 			}
 		}
