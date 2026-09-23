@@ -210,8 +210,10 @@ func preflight(spec Spec, input SourceInput) (string, []string, string) {
 	if len(input.Operations) != 2 {
 		return "exactly two parallel change operations are required", []string{"input:operations"}, Unknown
 	}
-	if len(spec.ApplicationOrders["A_then_B"]) != 2 || len(spec.ApplicationOrders["B_then_A"]) != 2 {
-		return "both declared application orders are required", []string{"meta:application-orders"}, Unknown
+	for _, orderName := range []string{"A_then_B", "B_then_A"} {
+		if !validApplicationOrder(spec.ApplicationOrders[orderName]) {
+			return "both declared application orders must apply each required operation exactly once", []string{"meta:application-orders:" + orderName}, Unknown
+		}
 	}
 	inputOperations := operationMap(input.Operations)
 	specOperations := operationMap(spec.ChangeOperations)
@@ -264,6 +266,14 @@ func preflight(spec Spec, input SourceInput) (string, []string, string) {
 		}
 	}
 	return "", nil, ""
+}
+
+func validApplicationOrder(order []string) bool {
+	if len(order) != 2 {
+		return false
+	}
+	return (order[0] == "change-a" && order[1] == "change-b") ||
+		(order[0] == "change-b" && order[1] == "change-a")
 }
 
 func orderCounterexample(spec Spec, input SourceInput, left, right OrderEvidence) *Counterexample {
