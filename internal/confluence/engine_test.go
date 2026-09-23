@@ -16,7 +16,7 @@ func testSpec() Spec {
 
 func testInput(caseID string, pathA, valueA, pathB, valueB string) SourceInput {
 	return SourceInput{
-		CaseID: caseID, SourceID: "test-source", Contract: "test/v1", Toolchain: "go1.27.0", Runner: "test-runner",
+		Schema: "gooo/source-input/v1", CaseID: caseID, SourceID: "test-source", Contract: "test/v1", Toolchain: "go1.27.0", Runner: "test-runner",
 		Baseline: map[string]string{"receipt.id": "test"},
 		Operations: []Operation{
 			{ID: "change-a", Authority: "source-owner-a", Scope: []string{pathA}, Patches: []Patch{{Path: pathA, Value: valueA}}},
